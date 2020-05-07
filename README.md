@@ -24,5 +24,6 @@ pip3 install -r requirements.txt
 It's recommended to use Forks away from your development repos so as to not get merge conflicts. Forks will clone your projects locally, add the remote upstream, fetch upstream changes, pull them in, and force push them to your origin repo. Cloning or updating forks will timeout after 120 seconds per fork.
 
 ```bash
-python3 forks.py
+# Pass your GitHub API key/token here:
+API_KEY=123... python3 forks.py
 ```
