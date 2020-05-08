@@ -11,7 +11,7 @@ Keep all your forks up to date with the remote master branch.
 
 </div>
 
-If you manage more than a couple forks, keeping them up to date with the remote master can be a pain. Sure you can merge them in on GitHub but that creates a merge commit which nobody wants, then if you choose to merge any of your changes into the remote repo, they get your lovely merge commits when all you wanted was to stay up to date. Forks lets you avoid all that.
+If you manage more than a couple git forks, keeping them up to date with the remote master can be a pain. Sure, you can merge them in on GitHub but that creates a merge commit which nobody wants, then if you choose to merge any of your changes into the remote repo, they get your lovely merge commits when all you wanted was to stay up to date. Forks lets you avoid all that. Forks will clone your projects locally, add the remote upstream, fetch upstream changes, pull them in, and force push them to your origin repo. Forks will also update all your repos concurrently.
 
 ## Install
 
@@ -21,9 +21,12 @@ pip3 install -r requirements.txt
 
 ## Usage
 
-It's recommended to use Forks away from your development repos so as to not get merge conflicts. Forks will clone your projects locally, add the remote upstream, fetch upstream changes, pull them in, and force push them to your origin repo. Cloning or updating forks will timeout after 120 seconds per fork.
+It's recommended to use Forks away from your development repos so as to not get merge conflicts. Cloning or updating forks will timeout after 120 seconds per fork.
 
 ```bash
+# Setup your ssh agent to ensure the script runs continually
+ssh-add
+
 # Pass your GitHub API key/token here:
 API_KEY=123... python3 forks.py
 ```
