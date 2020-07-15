@@ -16,7 +16,7 @@ If you manage more than a couple git forks, keeping them up to date with the rem
 ## Install
 
 ```bash
-pip3 install -r requirements.txt
+pip3 install forks-sync
 ```
 
 ## Usage
@@ -28,5 +28,19 @@ It's recommended to use Forks away from your development repos so as to not get 
 ssh-add
 
 # Pass your GitHub API key/token here:
-API_KEY=123... python3 forks.py
+API_KEY=123... forks
+```
+
+## Development
+
+Install project with dev depencencies:
+
+```bash
+pip3 install -e ."[dev]"
+```
+
+Lint the project:
+
+```bash
+pylint forks/*.py
 ```
