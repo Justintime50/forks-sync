@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 import sys
 import subprocess
-import time
 from threading import Thread
 from github import Github
 
@@ -56,21 +55,24 @@ class Forks():
     def run(cls):
         """Run the Forks script"""
         start_time = datetime.now()
-        # Check if API key is present
         if not os.getenv('API_KEY'):
-            sys.exit('API key must be present to run Forks.')
+            sys.exit('A GitHub `API_KEY` must be present to run Forks.')
         # Iterate over each repo (fork) and concurrently start an update process
-        count = 0
+        thread_list = []
         for repo in Forks.REPOS:
             if repo.fork is True and repo.owner.name == Forks.USER.get_user().name:
-                repo_path = os.path.join('forks', repo.name)
-                Thread(target=Forks.update, args=(repo, repo_path,)).start()
-                time.sleep(1)
-                count += 1
+                repo_path = os.path.join('forked_repos', repo.name)
+                fork_thread = Thread(target=Forks.update,
+                                     args=(repo, repo_path,))
+                thread_list.append(fork_thread)
+                fork_thread.start()
 
-        # TODO: Fix this as it will print without checking if each child process is finished.
-        execution_time = f'Execution time: {datetime.now() - start_time}. Forks iterated: {count}'
-        print('Script complete!', execution_time)
+        for thread in thread_list:
+            thread.join()
+
+        execution_time = f'Execution time: {datetime.now() - start_time}.'
+        print('Forks script complete! Your forks are now up to date with their' +
+              'remote master branch.', execution_time)
 
     @classmethod
     def logs(cls, data):
@@ -84,4 +86,10 @@ class Forks():
             sys.exit(os_error)
 
 
-Forks.run()
+def main():
+    """Run the main function of this tool"""
+    Forks.run()
+
+
+if __name__ == '__main__':
+    main()
