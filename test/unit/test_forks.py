@@ -33,7 +33,7 @@ def test_run(mock_logger, mock_verify_github_token, mock_setup_logging, mock_use
 @mock.patch('forks.sync.GITHUB_TOKEN', None)
 @mock.patch('forks.sync.LOGGER')
 def test_verify_github_token(mock_logger):
-    message = 'GITHUB_TOKEN must be present to run forks.'
+    message = 'GITHUB_TOKEN must be present to run forks-sync.'
     with pytest.raises(ValueError) as error:
         Forks.verify_github_token()
     mock_logger.critical.assert_called_with(message)
