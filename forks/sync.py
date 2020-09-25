@@ -1,94 +1,152 @@
-"""Import modules"""
-# pylint: disable=W0511
 import os
 from datetime import datetime
-import sys
 import subprocess
+import logging
+import logging.handlers
 from threading import Thread
 from github import Github
 
 
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+USER = Github(GITHUB_TOKEN).get_user()
+FORKS_SYNC_LOCATION = os.path.expanduser(
+    os.getenv('FORKS_SYNC_LOCATION', '~/forks-sync')
+)
+LOG_PATH = os.path.join(FORKS_SYNC_LOCATION, 'logs')
+LOG_FILE = os.path.join(LOG_PATH, 'forks.log')
+LOGGER = logging.getLogger(__name__)
+
+
 class Forks():
-    """Update your origin forks by rebasing the remote master"""
-    USER = Github(os.getenv('API_KEY'))
-    REPOS = USER.get_user().get_repos()
-    LOG_PATH = os.path.join('logs')
-    LOG_FILE = os.path.join(LOG_PATH, f'{datetime.now()}.log')
-
-    @classmethod
-    def update(cls, repo, repo_path):
-        """Clone forks that aren't local and update ones that are"""
-        if not os.path.exists(repo_path):
-            # Clone projects that don't exist
-            try:
-                git = subprocess.check_output(
-                    f'git clone --depth=10 --branch=master {repo.ssh_url} {repo_path} ' +
-                    f'&& cd {repo_path} && git remote add upstream {repo.parent.clone_url}',
-                    stdin=None, stderr=None, shell=True, timeout=120)
-                data = f'{repo.name}\nRepo cloned!'
-                print(data)
-                Forks.logs(data)
-            except subprocess.TimeoutExpired:
-                sys.exit(f'Error: Forks timed out cloning {repo.name}.')
-            except subprocess.CalledProcessError as error:
-                data = f'{repo.name}\n{error}'
-                print(data)
-                Forks.logs(data)
-
-        # Update your origin fork against the upstream master
-        try:
-            git = subprocess.check_output(
-                f'cd {repo_path} && git checkout master && git fetch upstream ' +
-                '&& git rebase upstream/master && git push origin -f',
-                stdin=None, stderr=None, shell=True, timeout=120)
-            data = f'{repo.name}\n{git.decode("UTF-8")}'
-            print(data)
-            Forks.logs(data)
-        except subprocess.TimeoutExpired:
-            sys.exit(f'Error: Forks timed out updating {repo.name}.')
-        except subprocess.CalledProcessError as error:
-            data = f'{repo.name}\n{error}'
-            print(data)
-            Forks.logs(data)
-
     @classmethod
     def run(cls):
-        """Run the Forks script"""
+        """Run the Forks script
+        """
         start_time = datetime.now()
-        if not os.getenv('API_KEY'):
-            sys.exit('A GitHub `API_KEY` must be present to run Forks.')
-        # Iterate over each repo (fork) and concurrently start an update process
+
+        cls.setup_logging()
+        cls.verify_github_token()
+        repos = cls.get_repos()
+        cls.iterate_repos(repos)
+
+        execution_time = f'Execution time: {datetime.now() - start_time}.'
+        message = f'Forks script complete! Your forks are now up to date with their remote master branch.\n{execution_time}'  # noqa
+        LOGGER.info(message)
+
+    @classmethod
+    def verify_github_token(cls):
+        """Verify that a GitHub Token is present
+        """
+        if not GITHUB_TOKEN:
+            message = 'GITHUB_TOKEN must be present to run forks-sync.'
+            LOGGER.critical(message)
+            raise ValueError(message)
+
+    @classmethod
+    def setup_logging(cls):
+        """Setup project logging (to console and log file)
+        """
+        if not os.path.exists(LOG_PATH):
+            os.makedirs(LOG_PATH)
+        LOGGER.setLevel(logging.INFO)
+        handler = logging.handlers.RotatingFileHandler(
+            LOG_FILE,
+            maxBytes=100000,
+            backupCount=5
+        )
+        formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+        LOGGER.addHandler(logging.StreamHandler())
+        LOGGER.addHandler(handler)
+
+    @classmethod
+    def get_repos(cls):
+        """Gets all the repos of a user
+        """
+        repos = USER.get_repos()
+        return repos
+
+    @classmethod
+    def iterate_repos(cls, repos):
+        """Iterate over each forked repo and concurrently start an update process
+        """
         thread_list = []
-        for repo in Forks.REPOS:
-            if repo.fork is True and repo.owner.name == Forks.USER.get_user().name:
-                repo_path = os.path.join('forked_repos', repo.name)
-                fork_thread = Thread(target=Forks.update,
-                                     args=(repo, repo_path,))
+        for repo in repos:
+            if repo.fork is True:
+                repo_path = os.path.join(
+                    FORKS_SYNC_LOCATION, 'forks', repo.name
+                )
+                fork_thread = Thread(
+                    target=Forks.sync_forks,
+                    args=(repo, repo_path,)
+                )
                 thread_list.append(fork_thread)
                 fork_thread.start()
 
         for thread in thread_list:
             thread.join()
 
-        execution_time = f'Execution time: {datetime.now() - start_time}.'
-        print('Forks script complete! Your forks are now up to date with their' +
-              'remote master branch.', execution_time)
+    @classmethod
+    def sync_forks(cls, repo, repo_path):
+        """Sync forks by cloning forks that aren't local
+        and rebasing the forked master of the ones that are.
+        """
+        if not os.path.exists(repo_path):
+            cls.clone_repo(repo, repo_path)
+
+        cls.rebase_repo(repo, repo_path)
 
     @classmethod
-    def logs(cls, data):
-        """Write output to a log"""
-        if not os.path.exists(Forks.LOG_PATH):
-            os.makedirs(Forks.LOG_PATH)
+    def clone_repo(cls, repo, repo_path):
+        """Clone projects that don't exist
+        """
         try:
-            with open(Forks.LOG_FILE, 'a') as log:
-                log.write(f'\n{data}\n')
-        except OSError as os_error:
-            sys.exit(os_error)
+            subprocess.run(
+                f'git clone --depth=10 --branch=master {repo.ssh_url} {repo_path} ' +  # noqa
+                f'&& cd {repo_path} && git remote add upstream {repo.parent.clone_url}',  # noqa
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True,
+                check=True,
+                timeout=120
+            )
+            data = f'{repo.name} cloned!'
+            LOGGER.info(data)
+        except subprocess.TimeoutExpired:
+            message = f'Forks timed out cloning {repo.name}.'
+            LOGGER.warning(message)
+        except subprocess.CalledProcessError as error:
+            data = f'{repo.name}\n{error}'
+            LOGGER.warning(data)
+
+    @classmethod
+    def rebase_repo(cls, repo, repo_path):
+        """Rebase your origin fork against the upstream master
+        """
+        try:
+            subprocess.run(
+                f'cd {repo_path} && git checkout master && git fetch upstream ' +  # noqa
+                '&& git rebase upstream/master && git push origin -f',
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True,
+                check=True,
+                timeout=120
+            )
+            data = f'{repo.name} rebased!'
+            LOGGER.info(data)
+        except subprocess.TimeoutExpired:
+            message = f'Forks timed out rebasing {repo.name}.'
+            LOGGER.warning(message)
+        except subprocess.CalledProcessError as error:
+            data = f'{repo.name}\n{error}'
+            LOGGER.warning(data)
 
 
 def main():
-    """Run the main function of this tool"""
-    Forks.run()
+    Forks().run()
 
 
 if __name__ == '__main__':

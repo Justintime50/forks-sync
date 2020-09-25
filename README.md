@@ -5,42 +5,56 @@
 Keep all your forks up to date with the remote master branch.
 
 [![Build Status](https://travis-ci.com/Justintime50/forks.svg?branch=master)](https://travis-ci.com/Justintime50/forks)
-[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/forks?branch=master)
+[![PyPi](https://img.shields.io/pypi/v/forks-sync)](https://pypi.org/project/forks-sync)
+[![Licence](https://img.shields.io/github/license/justintime50/forks)](LICENSE)
 
 <img src="assets/showcase.png">
 
 </div>
 
-If you manage more than a couple git forks, keeping them up to date with the remote master can be a pain. Sure, you can merge them in on GitHub but that creates a merge commit which nobody wants, then if you choose to merge any of your changes into the remote repo, they get your lovely merge commits when all you wanted was to stay up to date. Forks lets you avoid all that. Forks will clone your projects locally, add the remote upstream, fetch upstream changes, pull them in, and force push them to your origin repo. Forks will also update all your repos concurrently.
+If you manage more than a couple git forks, keeping them up to date with the remote master can be a pain. Forks lets you avoid all the fuss by concurrently cloning each of your projects locally, adding the remote upstream, fetching upstream changes, rebasing them, and force pushing to your origin repo master branch - keeping all your forks up to date with the original repo.
+
+By default, Forks will save all your forks to `~/forks-sync` where you can also find logs for this tool.
 
 ## Install
 
 ```bash
+# Install tool
 pip3 install forks-sync
+
+# Install locally
+make install
+
+# Get Makefile help
+make help
 ```
 
 ## Usage
-
-It's recommended to use Forks away from your development repos so as to not get merge conflicts. Cloning or updating forks will timeout after 120 seconds per fork.
 
 ```bash
 # Setup your ssh agent to ensure the script runs continually
 ssh-add
 
 # Pass your GitHub API key/token here:
-API_KEY=123... forks
+GITHUB_TOKEN=123... forks-sync
+
+# Optional params:
+# FORKS_SYNC_LOCATION="~/my-folder"
 ```
 
 ## Development
 
-Install project with dev depencencies:
-
 ```bash
-pip3 install -e ."[dev]"
-```
+# Lint the project
+make lint
 
-Lint the project:
+# Run tests
+make test
 
-```bash
-pylint forks/*.py
+# Run test coverage
+make coverage
+
+# Run the tool locally
+venv/bin/python forks/sync.py --help
 ```

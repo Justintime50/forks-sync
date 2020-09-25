@@ -9,8 +9,8 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='1.0.0',
-    description='Keep all your forks up to date with the remote master branch.',
+    version='2.0.0',
+    description='Keep all your forks up to date with the remote master branch.',  # noqa
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/forks',
@@ -25,12 +25,16 @@ setuptools.setup(
     install_requires=REQUIREMENTS,
     extras_require={
         'dev': [
-            'pylint >= 2.5.0',
+            'pytest >= 6.0.0',
+            'pytest-cov >= 2.10.0',
+            'coveralls >= 2.1.2',
+            'flake8 >= 3.8.0',
+            'mock >= 4.0.0',
         ]
     },
     entry_points={
         'console_scripts': [
-            'forks=forks.sync:main'
+            'forks-sync=forks.sync:main'
         ]
     },
     python_requires='>=3.6',
