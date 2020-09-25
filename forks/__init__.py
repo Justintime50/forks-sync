@@ -1,2 +1,2 @@
-"""Import Forks modules"""
-from .sync import Forks
+# flake8: noqa
+from forks.sync import Forks
