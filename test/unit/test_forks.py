@@ -114,16 +114,16 @@ def test_rebase_repo(mock_logger, mock_subprocess, mock_repo, mock_repo_path):
     mock_logger.info.assert_called_once_with(mock_repo.name + ' rebased!')
 
 
-@ mock.patch('forks.sync.LOGGER')
-@ mock.patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))  # noqa
+@mock.patch('forks.sync.LOGGER')
+@mock.patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))  # noqa
 def test_rebase_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mock_repo_path):  # noqa
     message = 'Forks timed out rebasing ' + mock_repo.name + '.'
     Forks.rebase_repo(mock_repo, mock_repo_path)
     mock_logger.warning.assert_called_with(message)
 
 
-@ mock.patch('forks.sync.LOGGER')
-@ mock.patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.run))  # noqa
+@mock.patch('forks.sync.LOGGER')
+@mock.patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.run))  # noqa
 def test_rebase_repo_called_process_error(mock_exception, mock_logger, mock_repo, mock_repo_path):  # noqa
     Forks.rebase_repo(mock_repo, mock_repo_path)
     mock_logger.warning.assert_called_once()
