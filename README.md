@@ -1,11 +1,11 @@
 <div align="center">
 
-# Forks
+# Forks Sync
 
-Keep all your forks up to date with the remote master branch.
+Keep all your forks up to date with the remote main branch.
 
-[![Build Status](https://travis-ci.com/Justintime50/forks.svg?branch=master)](https://travis-ci.com/Justintime50/forks)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/forks?branch=master)
+[![Build](https://github.com/Justintime50/forks-sync/workflows/build/badge.svg)](https://github.com/Justintime50/forks-sync/actions)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/forks?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/forks-sync)](https://pypi.org/project/forks-sync)
 [![Licence](https://img.shields.io/github/license/justintime50/forks)](LICENSE)
 
@@ -13,9 +13,9 @@ Keep all your forks up to date with the remote master branch.
 
 </div>
 
-If you manage more than a couple git forks, keeping them up to date with the remote master can be a pain. Forks lets you avoid all the fuss by concurrently cloning each of your projects locally, adding the remote upstream, fetching upstream changes, rebasing them, and force pushing to your origin repo master branch - keeping all your forks up to date with the original repo.
+If you manage more than a couple git forks, keeping them up to date with the remote main branch can be a pain. Forks Sync lets you avoid all the fuss by concurrently cloning each of your projects locally, adding the remote upstream, fetching upstream changes, rebasing them, and force pushing to your origin repo main branch - keeping all your forks up to date with the original repo.
 
-By default, Forks will save all your forks to `~/forks-sync` where you can also find logs for this tool.
+By default, Forks Sync will save all your forks to `~/forks-sync` where you can also find logs for this tool.
 
 ## Install
 

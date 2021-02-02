@@ -1,11 +1,11 @@
-import os
-from datetime import datetime
-import subprocess
 import logging
 import logging.handlers
+import os
+import subprocess
+from datetime import datetime
 from threading import Thread
-from github import Github
 
+from github import Github
 
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 USER = Github(GITHUB_TOKEN).get_user()
@@ -15,26 +15,27 @@ FORKS_SYNC_LOCATION = os.path.expanduser(
 LOG_PATH = os.path.join(FORKS_SYNC_LOCATION, 'logs')
 LOG_FILE = os.path.join(LOG_PATH, 'forks.log')
 LOGGER = logging.getLogger(__name__)
+TIMEOUT = 180
 
 
-class Forks():
-    @classmethod
-    def run(cls):
-        """Run the Forks script
+class ForksSync():
+    @staticmethod
+    def run():
+        """Run the Forks Sync script
         """
         start_time = datetime.now()
 
-        cls.setup_logging()
-        cls.verify_github_token()
-        repos = cls.get_repos()
-        cls.iterate_repos(repos)
+        ForksSync._setup_logging()
+        ForksSync._verify_github_token()
+        repos = ForksSync.get_repos()
+        ForksSync.iterate_repos(repos)
 
         execution_time = f'Execution time: {datetime.now() - start_time}.'
-        message = f'Forks script complete! Your forks are now up to date with their remote master branch.\n{execution_time}'  # noqa
+        message = f'Forks script complete! Your forks are now up to date with their remote {branch} branch.\n{execution_time}'
         LOGGER.info(message)
 
-    @classmethod
-    def verify_github_token(cls):
+    @staticmethod
+    def _verify_github_token():
         """Verify that a GitHub Token is present
         """
         if not GITHUB_TOKEN:
@@ -42,8 +43,8 @@ class Forks():
             LOGGER.critical(message)
             raise ValueError(message)
 
-    @classmethod
-    def setup_logging(cls):
+    @staticmethod
+    def _setup_logging():
         """Setup project logging (to console and log file)
         """
         if not os.path.exists(LOG_PATH):
@@ -61,15 +62,15 @@ class Forks():
         LOGGER.addHandler(logging.StreamHandler())
         LOGGER.addHandler(handler)
 
-    @classmethod
-    def get_repos(cls):
+    @staticmethod
+    def get_repos():
         """Gets all the repos of a user
         """
         repos = USER.get_repos()
         return repos
 
-    @classmethod
-    def iterate_repos(cls, repos):
+    @staticmethod
+    def iterate_repos(repos):
         """Iterate over each forked repo and concurrently start an update process
         """
         thread_list = []
@@ -88,29 +89,32 @@ class Forks():
         for thread in thread_list:
             thread.join()
 
-    @classmethod
-    def sync_forks(cls, repo, repo_path):
+    @staticmethod
+    def sync_forks(repo, repo_path, branch='main'):
         """Sync forks by cloning forks that aren't local
         and rebasing the forked master of the ones that are.
         """
         if not os.path.exists(repo_path):
-            cls.clone_repo(repo, repo_path)
+            ForksSync.clone_repo(repo, repo_path, branch)
 
-        cls.rebase_repo(repo, repo_path)
+        ForksSync.rebase_repo(repo, repo_path)
 
-    @classmethod
-    def clone_repo(cls, repo, repo_path):
+    @staticmethod
+    def clone_repo(repo, repo_path, branch='main'):
         """Clone projects that don't exist
         """
         try:
             subprocess.run(
-                f'git clone --depth=10 --branch=master {repo.ssh_url} {repo_path} ' +  # noqa
-                f'&& cd {repo_path} && git remote add upstream {repo.parent.clone_url}',  # noqa
+                (
+                    f'git clone --depth=10 --branch={branch} {repo.ssh_url} {repo_path}'
+                    f' && cd {repo_path}'
+                    f' && git remote add upstream {repo.parent.clone_url}'
+                ),
                 stdin=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 shell=True,
                 check=True,
-                timeout=120
+                timeout=TIMEOUT
             )
             data = f'{repo.name} cloned!'
             LOGGER.info(data)
@@ -121,19 +125,24 @@ class Forks():
             data = f'{repo.name}\n{error}'
             LOGGER.warning(data)
 
-    @classmethod
-    def rebase_repo(cls, repo, repo_path):
-        """Rebase your origin fork against the upstream master
+    @staticmethod
+    def rebase_repo(repo, repo_path, branch='main'):
+        """Rebase your origin fork against the upstream "main" branch
         """
         try:
             subprocess.run(
-                f'cd {repo_path} && git checkout master && git fetch upstream ' +  # noqa
-                '&& git rebase upstream/master && git push origin -f',
+                (
+                    f'cd {repo_path}'
+                    f' && git checkout {branch}'
+                    f' && git fetch upstream'
+                    f' && git rebase upstream/{branch}'
+                    f' && git push origin -f'
+                ),
                 stdin=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 shell=True,
                 check=True,
-                timeout=120
+                timeout=TIMEOUT
             )
             data = f'{repo.name} rebased!'
             LOGGER.info(data)

@@ -13,7 +13,7 @@ setuptools.setup(
     description='Keep all your forks up to date with the remote master branch.',  # noqa
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='http://github.com/justintime50/forks',
+    url='http://github.com/justintime50/forks-sync',
     author='Justintime50',
     license='MIT',
     packages=setuptools.find_packages(),
