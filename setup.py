@@ -9,8 +9,8 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='2.0.0',
-    description='Keep all your forks up to date with the remote master branch.',  # noqa
+    version='2.1.0',
+    description='Keep all your git forks up to date with the remote main branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/forks-sync',
@@ -34,7 +34,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts': [
-            'forks-sync=forks.sync:main'
+            'forks-sync=forks_sync.sync:main'
         ]
     },
     python_requires='>=3.6',

@@ -5,19 +5,6 @@ import pytest
 from forks_sync import ForksSync
 
 
-@pytest.fixture(scope='module')
-def mock_repo():
-    mock_repo = mock.Mock()
-    mock_repo.name = 'mock-repo'
-    mock_repo.fork = True
-    return mock_repo
-
-
-@pytest.fixture(scope='module')
-def mock_repo_path():
-    return 'test/forks/mock-repo'
-
-
 @mock.patch('forks_sync.sync.GITHUB_TOKEN', '123')
 @mock.patch('forks_sync.sync.USER.get_repos')
 @mock.patch('forks_sync.sync.USER')
@@ -55,8 +42,8 @@ def test_setup_logger(mock_logger, mock_make_dirs):
 
 @mock.patch('forks_sync.sync.USER.get_repos')
 @mock.patch('forks_sync.sync.USER')
-def test_get_repos(mock_user, mock_get_repos):
-    ForksSync.get_repos()
+def test_get_forked_repos(mock_user, mock_get_repos):
+    ForksSync.get_forked_repos()
     mock_get_repos.assert_called_once()
 
 
@@ -65,15 +52,7 @@ def test_get_repos(mock_user, mock_get_repos):
 def test_iterate_repos_fork_true(mock_sync_forks, mock_repo):
     mock_repos = [mock_repo]
     ForksSync.iterate_repos(mock_repos)
-    mock_sync_forks.assert_called_with(mock_repo, 'test/forks/mock-repo')
-
-
-@mock.patch('forks_sync.sync.ForksSync.sync_forks')
-def test_iterate_repos_fork_false(mock_sync_forks, mock_repo):
-    mock_repo.fork = False
-    mock_repos = [mock_repo]
-    ForksSync.iterate_repos(mock_repos)
-    mock_sync_forks.assert_not_called()
+    mock_sync_forks.assert_called_with(mock_repo, 'test/forks/mock-repo', 'main')
 
 
 @mock.patch('forks_sync.sync.ForksSync.rebase_repo')
@@ -81,7 +60,7 @@ def test_iterate_repos_fork_false(mock_sync_forks, mock_repo):
 def test_sync_forks(mock_clone_repo, mock_rebase_repo, mock_repo, mock_repo_path):  # noqa
     ForksSync.sync_forks(mock_repo, mock_repo_path)
     mock_clone_repo.assert_called_with(mock_repo, mock_repo_path)
-    mock_rebase_repo.assert_called_with(mock_repo, mock_repo_path)
+    mock_rebase_repo.assert_called_with(mock_repo, mock_repo_path, 'main')
 
 
 @mock.patch('subprocess.run')
@@ -95,7 +74,7 @@ def test_clone_repo(mock_logger, mock_subprocess, mock_repo, mock_repo_path):
 @mock.patch('forks_sync.sync.LOGGER')
 @mock.patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))  # noqa
 def test_clone_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mock_repo_path):  # noqa
-    message = 'ForksSync timed out cloning ' + mock_repo.name + '.'
+    message = 'Forks Sync timed out cloning ' + mock_repo.name + '.'
     ForksSync.clone_repo(mock_repo, mock_repo_path)
     mock_logger.warning.assert_called_with(message)
 
@@ -118,7 +97,7 @@ def test_rebase_repo(mock_logger, mock_subprocess, mock_repo, mock_repo_path):
 @mock.patch('forks_sync.sync.LOGGER')
 @mock.patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))  # noqa
 def test_rebase_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mock_repo_path):  # noqa
-    message = 'ForksSync timed out rebasing ' + mock_repo.name + '.'
+    message = 'Forks Sync timed out rebasing ' + mock_repo.name + '.'
     ForksSync.rebase_repo(mock_repo, mock_repo_path)
     mock_logger.warning.assert_called_with(message)
 

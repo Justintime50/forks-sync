@@ -1,3 +1,4 @@
+import argparse
 import logging
 import logging.handlers
 import os
@@ -18,20 +19,41 @@ LOGGER = logging.getLogger(__name__)
 TIMEOUT = 180
 
 
+class Cli():
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            description='Keep all your git forks up to date with the remote main branch.'
+        )
+        parser.add_argument(
+            '-b',
+            '--branch',
+            required=False,
+            default='main',
+            type=str,
+            help='The branch Forks Sync will rebase against the remote repo.'
+        )
+        parser.parse_args(namespace=self)
+
+    def run(self):
+        ForksSync.run(
+            branch=self.branch,
+        )
+
+
 class ForksSync():
     @staticmethod
-    def run():
+    def run(branch='main'):
         """Run the Forks Sync script
         """
         start_time = datetime.now()
 
         ForksSync._setup_logging()
         ForksSync._verify_github_token()
-        repos = ForksSync.get_repos()
-        ForksSync.iterate_repos(repos)
+        repos = ForksSync.get_forked_repos()
+        ForksSync.iterate_repos(repos, branch)
 
         execution_time = f'Execution time: {datetime.now() - start_time}.'
-        message = f'Forks script complete! Your forks are now up to date with their remote {branch} branch.\n{execution_time}'
+        message = f'Forks Sync complete! Your forks are now up to date with their remote {branch} branch.\n{execution_time}'  # noqa
         LOGGER.info(message)
 
     @staticmethod
@@ -63,28 +85,29 @@ class ForksSync():
         LOGGER.addHandler(handler)
 
     @staticmethod
-    def get_repos():
-        """Gets all the repos of a user
+    def get_forked_repos():
+        """Gets all the repos of a user and returns a list of forks
         """
         repos = USER.get_repos()
-        return repos
+        forked_repos = [repo for repo in repos if repo.fork and repo.owner.name == USER.name]
+
+        return forked_repos
 
     @staticmethod
-    def iterate_repos(repos):
+    def iterate_repos(repos, branch='main'):
         """Iterate over each forked repo and concurrently start an update process
         """
         thread_list = []
         for repo in repos:
-            if repo.fork is True:
-                repo_path = os.path.join(
-                    FORKS_SYNC_LOCATION, 'forks', repo.name
-                )
-                fork_thread = Thread(
-                    target=Forks.sync_forks,
-                    args=(repo, repo_path,)
-                )
-                thread_list.append(fork_thread)
-                fork_thread.start()
+            repo_path = os.path.join(
+                FORKS_SYNC_LOCATION, 'forks', repo.name
+            )
+            fork_thread = Thread(
+                target=ForksSync.sync_forks,
+                args=(repo, repo_path, branch,)
+            )
+            thread_list.append(fork_thread)
+            fork_thread.start()
 
         for thread in thread_list:
             thread.join()
@@ -95,18 +118,18 @@ class ForksSync():
         and rebasing the forked master of the ones that are.
         """
         if not os.path.exists(repo_path):
-            ForksSync.clone_repo(repo, repo_path, branch)
+            ForksSync.clone_repo(repo, repo_path)
 
-        ForksSync.rebase_repo(repo, repo_path)
+        ForksSync.rebase_repo(repo, repo_path, branch)
 
     @staticmethod
-    def clone_repo(repo, repo_path, branch='main'):
+    def clone_repo(repo, repo_path):
         """Clone projects that don't exist
         """
         try:
             subprocess.run(
                 (
-                    f'git clone --depth=10 --branch={branch} {repo.ssh_url} {repo_path}'
+                    f'git clone --depth=10 {repo.ssh_url} {repo_path}'
                     f' && cd {repo_path}'
                     f' && git remote add upstream {repo.parent.clone_url}'
                 ),
@@ -119,7 +142,7 @@ class ForksSync():
             data = f'{repo.name} cloned!'
             LOGGER.info(data)
         except subprocess.TimeoutExpired:
-            message = f'Forks timed out cloning {repo.name}.'
+            message = f'Forks Sync timed out cloning {repo.name}.'
             LOGGER.warning(message)
         except subprocess.CalledProcessError as error:
             data = f'{repo.name}\n{error}'
@@ -147,7 +170,7 @@ class ForksSync():
             data = f'{repo.name} rebased!'
             LOGGER.info(data)
         except subprocess.TimeoutExpired:
-            message = f'Forks timed out rebasing {repo.name}.'
+            message = f'Forks Sync timed out rebasing {repo.name}.'
             LOGGER.warning(message)
         except subprocess.CalledProcessError as error:
             data = f'{repo.name}\n{error}'
@@ -155,7 +178,7 @@ class ForksSync():
 
 
 def main():
-    Forks().run()
+    Cli().run()
 
 
 if __name__ == '__main__':
