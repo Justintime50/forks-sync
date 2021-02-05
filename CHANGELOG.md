@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v2.1.0 (2021-TODO)
+## v2.1.0 (2021-02-04)
 
 * Renamed project from `Forks` to `Forks Sync`, usage and command names however were already that and did not change. This brings the documentation and GitHub references inline with the published package
 * Fixed a bug that would attempt to rebase all your org repos unintentionally, now there are checks to ensure the repo belongs to the same person whose GitHub token is used
