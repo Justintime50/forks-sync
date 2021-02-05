@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.1.0 (2021-TODO)
+
+* Renamed project from `Forks` to `Forks Sync`, usage and command names however were already that and did not change. This brings the documentation and GitHub references inline with the published package
+* Fixed a bug that would attempt to rebase all your org repos unintentionally, now there are checks to ensure the repo belongs to the same person whose GitHub token is used
+* Removed references of `master` branch and replaced with `main`
+* Added a flag where you can specify the name of your branches (closes #3)
+* Switched from Travis CI to GitHub Actions
+
 ## v2.0.0 (2020-09-24)
 
 * Added unit tests and test coverage
