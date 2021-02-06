@@ -5,7 +5,7 @@
 Keep all your git forks up to date with the remote main branch.
 
 [![Build Status](https://github.com/Justintime50/forks-sync/workflows/build/badge.svg)](https://github.com/Justintime50/forks-sync/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/forks?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks-sync/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/forks-sync?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/forks-sync)](https://pypi.org/project/forks-sync)
 [![Licence](https://img.shields.io/github/license/justintime50/forks)](LICENSE)
 
