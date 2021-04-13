@@ -52,7 +52,7 @@ def test_get_forked_repos(mock_user, mock_get_repos):
 def test_iterate_repos_fork_true(mock_sync_forks, mock_repo):
     mock_repos = [mock_repo]
     ForksSync.iterate_repos(mock_repos)
-    mock_sync_forks.assert_called_with(mock_repo, 'test/forks/mock-repo', 'main')
+    mock_sync_forks.assert_called_with(mock_repo, 'test/forks/mock-repo')
 
 
 @mock.patch('forks_sync.sync.ForksSync.rebase_repo')
@@ -60,7 +60,7 @@ def test_iterate_repos_fork_true(mock_sync_forks, mock_repo):
 def test_sync_forks(mock_clone_repo, mock_rebase_repo, mock_repo, mock_repo_path):  # noqa
     ForksSync.sync_forks(mock_repo, mock_repo_path)
     mock_clone_repo.assert_called_with(mock_repo, mock_repo_path)
-    mock_rebase_repo.assert_called_with(mock_repo, mock_repo_path, 'main')
+    mock_rebase_repo.assert_called_with(mock_repo, mock_repo_path)
 
 
 @mock.patch('subprocess.run')

@@ -9,7 +9,7 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='2.1.0',
+    version='2.2.0',
     description='Keep all your git forks up to date with the remote main branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",

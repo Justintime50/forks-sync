@@ -13,11 +13,11 @@ Keep all your git forks up to date with the remote main branch.
 
 </div>
 
-If you manage more than a couple git forks, keeping them up to date with the remote main branch can be a pain. Forks Sync lets you avoid all the fuss by concurrently cloning each of your projects locally, adding the remote upstream, fetching upstream changes, rebasing them, and force pushing to your origin repo main branch - keeping all your forks up to date with the original repo.
+If you manage more than a couple git forks, keeping them up to date with the remote default branch can be a pain. Forks Sync lets you avoid all the fuss by concurrently cloning each of your projects locally, adding the remote upstream, fetching new changes, rebasing your local default branch against the remote default branch, and `force pushing` to your origin repo's default branch - keeping all your forks up to date with the original repo.
 
 By default, Forks Sync will save all your forks to `~/forks-sync` where you can also find logs for this tool.
 
-**Note:** Before proceeding, know that this tool will forcefully update the main branch of your fork to match the upstream main branch.
+**Note:** Before proceeding, know that this tool will forcefully update the default branch of your fork to match the upstream default branch.
 
 ## Install
 
@@ -39,7 +39,7 @@ make help
 ssh-add
 
 # Pass your GitHub API key/token here:
-GITHUB_TOKEN=123... forks-sync --branch my_main_branch
+GITHUB_TOKEN=123... forks-sync
 
 # Optional params:
 # FORKS_SYNC_LOCATION="~/my-folder"
@@ -58,5 +58,5 @@ make test
 make coverage
 
 # Run the tool locally
-venv/bin/python forks/sync.py --help
+venv/bin/python forks_sync/sync.py
 ```
