@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.2.0 (2021-04-12)
+
+* Removed the `branch` flag and functionality as it was causing issues and inconsistencies when cloning/rebasing and branches didn't match up. This became especially prevelant when repos started changing from master to main. Now, we will retrieve the default branch from the parent repo (upstream) and rebase against that. This ensures consistency and safety
+* Changed clone depth from 10 to 1
+
 ## v2.1.0 (2021-02-04)
 
 * Renamed project from `Forks` to `Forks Sync`, usage and command names however were already that and did not change. This brings the documentation and GitHub references inline with the published package

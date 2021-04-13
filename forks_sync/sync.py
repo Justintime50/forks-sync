@@ -1,4 +1,3 @@
-import argparse
 import logging
 import logging.handlers
 import os
@@ -19,30 +18,9 @@ LOGGER = logging.getLogger(__name__)
 TIMEOUT = 180
 
 
-class Cli():
-    def __init__(self):
-        parser = argparse.ArgumentParser(
-            description='Keep all your git forks up to date with the remote main branch.'
-        )
-        parser.add_argument(
-            '-b',
-            '--branch',
-            required=False,
-            default='main',
-            type=str,
-            help='The branch Forks Sync will rebase against the remote repo.'
-        )
-        parser.parse_args(namespace=self)
-
-    def run(self):
-        ForksSync.run(
-            branch=self.branch,
-        )
-
-
 class ForksSync():
     @staticmethod
-    def run(branch='main'):
+    def run():
         """Run the Forks Sync script
         """
         start_time = datetime.now()
@@ -50,10 +28,10 @@ class ForksSync():
         ForksSync._setup_logging()
         ForksSync._verify_github_token()
         repos = ForksSync.get_forked_repos()
-        ForksSync.iterate_repos(repos, branch)
+        ForksSync.iterate_repos(repos)
 
         execution_time = f'Execution time: {datetime.now() - start_time}.'
-        message = f'Forks Sync complete! Your forks are now up to date with their remote {branch} branch.\n{execution_time}'  # noqa
+        message = f'Forks Sync complete! Your forks are now up to date with their remote default branch.\n{execution_time}'  # noqa
         LOGGER.info(message)
 
     @staticmethod
@@ -94,7 +72,7 @@ class ForksSync():
         return forked_repos
 
     @staticmethod
-    def iterate_repos(repos, branch='main'):
+    def iterate_repos(repos):
         """Iterate over each forked repo and concurrently start an update process
         """
         thread_list = []
@@ -104,7 +82,7 @@ class ForksSync():
             )
             fork_thread = Thread(
                 target=ForksSync.sync_forks,
-                args=(repo, repo_path, branch,)
+                args=(repo, repo_path,)
             )
             thread_list.append(fork_thread)
             fork_thread.start()
@@ -113,14 +91,14 @@ class ForksSync():
             thread.join()
 
     @staticmethod
-    def sync_forks(repo, repo_path, branch='main'):
+    def sync_forks(repo, repo_path):
         """Sync forks by cloning forks that aren't local
         and rebasing the forked master of the ones that are.
         """
         if not os.path.exists(repo_path):
             ForksSync.clone_repo(repo, repo_path)
 
-        ForksSync.rebase_repo(repo, repo_path, branch)
+        ForksSync.rebase_repo(repo, repo_path)
 
     @staticmethod
     def clone_repo(repo, repo_path):
@@ -129,7 +107,7 @@ class ForksSync():
         try:
             subprocess.run(
                 (
-                    f'git clone --depth=10 {repo.ssh_url} {repo_path}'
+                    f'git clone --depth=1 {repo.ssh_url} {repo_path}'
                     f' && cd {repo_path}'
                     f' && git remote add upstream {repo.parent.clone_url}'
                 ),
@@ -149,9 +127,10 @@ class ForksSync():
             LOGGER.warning(data)
 
     @staticmethod
-    def rebase_repo(repo, repo_path, branch='main'):
-        """Rebase your origin fork against the upstream "main" branch
+    def rebase_repo(repo, repo_path):
+        """Rebase your origin fork against the upstream default branch
         """
+        branch = repo.parent.default_branch
         try:
             subprocess.run(
                 (
@@ -178,7 +157,7 @@ class ForksSync():
 
 
 def main():
-    Cli().run()
+    ForksSync().run()
 
 
 if __name__ == '__main__':
