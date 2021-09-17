@@ -9,7 +9,7 @@ Keep all your git forks up to date with the remote main branch.
 [![PyPi](https://img.shields.io/pypi/v/forks-sync)](https://pypi.org/project/forks-sync)
 [![Licence](https://img.shields.io/github/license/justintime50/forks)](LICENSE)
 
-<img src="assets/showcase.png">
+<img src="https://raw.githubusercontent.com/justintime50/assets/main/src/forks-sync/showcase.png" alt="Showcase">
 
 </div>
 
