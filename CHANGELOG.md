@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.3.0 (2021-09-20)
+
+* Drops support for Python 3.6
+* Swaps `mock` library for builtin `unittest.mock` library
+* Formats project with `Black`
+
 ## v2.2.0 (2021-04-12)
 
 * Removed the `branch` flag and functionality as it was causing issues and inconsistencies when cloning/rebasing and branches didn't match up. This became especially prevelant when repos started changing from master to main. Now, we will retrieve the default branch from the parent repo (upstream) and rebase against that. This ensures consistency and safety
