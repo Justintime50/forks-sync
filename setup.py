@@ -10,14 +10,13 @@ REQUIREMENTS = [
 DEV_REQUIREMENTS = [
     'coveralls == 3.*',
     'flake8',
-    'mock == 4.*',
     'pytest == 6.*',
     'pytest-cov == 2.*',
 ]
 
 setuptools.setup(
     name='forks-sync',
-    version='2.2.0',
+    version='2.3.0',
     description='Keep all your git forks up to date with the remote main branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,12 +31,12 @@ setuptools.setup(
     ],
     install_requires=REQUIREMENTS,
     extras_require={
-        'dev': DEV_REQUIREMENTS
+        'dev': DEV_REQUIREMENTS,
     },
     entry_points={
         'console_scripts': [
-            'forks-sync=forks_sync.sync:main'
-        ]
+            'forks-sync=forks_sync.sync:main',
+        ],
     },
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )
