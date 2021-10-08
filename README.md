@@ -27,9 +27,6 @@ pip3 install forks-sync
 
 # Install locally
 make install
-
-# Get Makefile help
-make help
 ```
 
 ## Usage
@@ -48,14 +45,8 @@ GITHUB_TOKEN=123... forks-sync
 ## Development
 
 ```bash
-# Lint the project
-make lint
-
-# Run tests
-make test
-
-# Run test coverage
-make coverage
+# Get a comprehensive list of development tools
+make help
 
 # Run the tool locally
 venv/bin/python forks_sync/sync.py
