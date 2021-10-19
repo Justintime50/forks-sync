@@ -2,7 +2,7 @@
 
 # Forks Sync
 
-Keep all your git forks up to date with the remote main branch.
+Keep all your git forks up to date with the remote default branch.
 
 [![Build Status](https://github.com/Justintime50/forks-sync/workflows/build/badge.svg)](https://github.com/Justintime50/forks-sync/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Justintime50/forks-sync/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/forks-sync?branch=main)
