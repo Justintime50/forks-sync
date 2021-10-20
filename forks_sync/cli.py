@@ -47,7 +47,7 @@ class ForksSyncCli:
             type=str,
             required=False,
             default=DEFAULT_LOCATION,
-            help='The location where you want your GitHub Archive to be stored.',
+            help='The location where you want your forks and logs to be stored.',
         ),
         parser.parse_args(namespace=self)
 

@@ -47,7 +47,7 @@ Options:
     -to TIMEOUT, --timeout TIMEOUT
                             The number of seconds before a git operation times out.
     -l LOCATION, --location LOCATION
-                            The location where you want your GitHub Archive to be stored.
+                            The location where you want your forks and logs to be stored.
 ```
 
 ### Automating SSH Passphrase Prompt (Recommended)
