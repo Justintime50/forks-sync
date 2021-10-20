@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v3.0.0 (2021-10-19)
+
+* Refactors the entire app to use CLI arguments instead of environment variables
+* Added a `--force` flag to ensure users don't accidentally blow away their default branches unless they explicitly wanted to. Without passing this flag, the tool will run in "dry mode"
+* Now restricts the tool to run with 10 threads by default
+* Added additional logging
+
 ## v2.3.0 (2021-09-20)
 
 * Drops support for Python 3.6
