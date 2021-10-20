@@ -6,7 +6,9 @@ from forks_sync.constants import DEFAULT_LOCATION, DEFAULT_NUM_THREADS, DEFAULT_
 
 class ForksSyncCli:
     def __init__(self):
-        parser = argparse.ArgumentParser(description='Keep all your git forks up to date with the remote main branch.')
+        parser = argparse.ArgumentParser(
+            description='Keep all your git forks up to date with the remote default branch.'
+        )
         parser.add_argument(
             '-t',
             '--token',
