@@ -31,8 +31,6 @@ make install
 
 ## Usage
 
-
-
 ```
 Usage:
     forks-sync --token 123...
