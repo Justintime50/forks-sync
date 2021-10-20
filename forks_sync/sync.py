@@ -1,79 +1,86 @@
 import logging
-import logging.handlers
 import os
 import subprocess
 from datetime import datetime
-from threading import Thread
+from threading import BoundedSemaphore, Thread
 
 from github import Github
 
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-USER = Github(GITHUB_TOKEN).get_user()
-FORKS_SYNC_LOCATION = os.path.expanduser(os.getenv('FORKS_SYNC_LOCATION', '~/forks-sync'))
-LOG_PATH = os.path.join(FORKS_SYNC_LOCATION, 'logs')
-LOG_FILE = os.path.join(LOG_PATH, 'forks.log')
+from forks_sync.constants import DEFAULT_LOCATION, DEFAULT_NUM_THREADS, DEFAULT_TIMEOUT
+from forks_sync.logger import Logger
+
 LOGGER = logging.getLogger(__name__)
-TIMEOUT = 180
 
 
 class ForksSync:
-    @staticmethod
-    def run():
-        """Run the Forks Sync script"""
-        start_time = datetime.now()
+    def __init__(
+        self,
+        token=None,
+        force=False,
+        threads=DEFAULT_NUM_THREADS,
+        timeout=DEFAULT_TIMEOUT,
+        location=DEFAULT_LOCATION,
+    ):
+        # Parameter variables
+        self.token = token
+        self.force = force
+        self.threads = threads
+        self.timeout = timeout
+        self.location = location
 
-        ForksSync._setup_logging()
-        ForksSync._verify_github_token()
-        repos = ForksSync.get_forked_repos()
-        ForksSync.iterate_repos(repos)
+        # Internal variables
+        self.github_instance = Github(self.token) if self.token else Github()
+        self.authenticated_user = self.github_instance.get_user() if self.token else None
+
+    def run(self):
+        """Run the Forks Sync script"""
+        self.initialize_project()
+        start_time = datetime.now()
+        Logger.setup_logging(LOGGER, self.location)
+        LOGGER.info('Starting up Forks Sync...')
+
+        repos = self.get_forked_repos()
+        self.iterate_repos(repos)
 
         execution_time = f'Execution time: {datetime.now() - start_time}.'
-        message = (
-            f'Forks Sync complete! Your forks are now up to date with their remote default branch.\n{execution_time}'
-        )
+        if self.force:
+            message = (
+                'Forks Sync complete! Your forks are now up to date with their remote default'
+                f' branch.\n{execution_time}'
+            )
+        else:
+            message = (
+                'Forks Sync has completed a dry run. Logs display what would have happened but no action was taken. To'
+                ' really run Forks Sync, simply pass the --force flag.'
+            )
         LOGGER.info(message)
 
-    @staticmethod
-    def _verify_github_token():
-        """Verify that a GitHub Token is present"""
-        if not GITHUB_TOKEN:
-            message = 'GITHUB_TOKEN must be present to run forks-sync.'
+    def initialize_project(self):
+        """Initialize the tool and ensure everything is in order before running any logic."""
+        if not self.token:
+            message = '"token" must be present to run forks-sync.'
             LOGGER.critical(message)
             raise ValueError(message)
 
-    @staticmethod
-    def _setup_logging():
-        """Setup project logging (to console and log file)"""
-        if not os.path.exists(LOG_PATH):
-            os.makedirs(LOG_PATH)
-        LOGGER.setLevel(logging.INFO)
-        handler = logging.handlers.RotatingFileHandler(
-            LOG_FILE,
-            maxBytes=100000,
-            backupCount=5,
-        )
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        handler.setFormatter(formatter)
-        LOGGER.addHandler(logging.StreamHandler())
-        LOGGER.addHandler(handler)
-
-    @staticmethod
-    def get_forked_repos():
+    def get_forked_repos(self):
         """Gets all the repos of a user and returns a list of forks"""
-        repos = USER.get_repos()
-        forked_repos = [repo for repo in repos if repo.fork and repo.owner.name == USER.name]
+        repos = self.authenticated_user.get_repos()
+        forked_repos = [repo for repo in repos if repo.fork and repo.owner.name == self.authenticated_user.name]
+        LOGGER.info('Forks retrieved from GitHub!')
 
         return forked_repos
 
-    @staticmethod
-    def iterate_repos(repos):
-        """Iterate over each forked repo and concurrently start an update process"""
+    def iterate_repos(self, repos):
+        """Iterate over each forked repo and concurrently start an update process."""
+        thread_limiter = BoundedSemaphore(self.threads)
         thread_list = []
+
         for repo in repos:
-            repo_path = os.path.join(FORKS_SYNC_LOCATION, 'forks', repo.name)
+            repo_path = os.path.join(self.location, 'forks', repo.name)
             fork_thread = Thread(
-                target=ForksSync.sync_forks,
+                target=self.sync_forks,
                 args=(
+                    thread_limiter,
                     repo,
                     repo_path,
                 ),
@@ -81,22 +88,21 @@ class ForksSync:
             thread_list.append(fork_thread)
             fork_thread.start()
 
+        # Wait for the number of threads in thread_limiter to finish before moving on
         for thread in thread_list:
             thread.join()
 
-    @staticmethod
-    def sync_forks(repo, repo_path):
+    def sync_forks(self, thread_limiter, repo, repo_path):
         """Sync forks by cloning forks that aren't local
-        and rebasing the forked master of the ones that are.
+        and rebasing the forked default branch of the ones that are.
         """
         if not os.path.exists(repo_path):
-            ForksSync.clone_repo(repo, repo_path)
+            self.clone_repo(thread_limiter, repo, repo_path)
 
-        ForksSync.rebase_repo(repo, repo_path)
+        self.rebase_repo(thread_limiter, repo, repo_path)
 
-    @staticmethod
-    def clone_repo(repo, repo_path):
-        """Clone projects that don't exist"""
+    def clone_repo(self, thread_limiter, repo, repo_path):
+        """Clone projects that don't exist locally."""
         command = (
             f'git clone --depth=1 {repo.ssh_url} {repo_path}'
             f' && cd {repo_path}'
@@ -104,25 +110,26 @@ class ForksSync:
         )
 
         try:
-            subprocess.run(
-                command,
-                stdin=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                shell=True,
-                check=True,
-                timeout=TIMEOUT,
-            )
-            data = f'{repo.name} cloned!'
-            LOGGER.info(data)
+            thread_limiter.acquire()
+            if self.force:
+                subprocess.run(
+                    command,
+                    stdin=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    shell=True,
+                    check=True,
+                    timeout=self.timeout,
+                )
+            message = f'{repo.name} cloned!'
+            LOGGER.info(message)
         except subprocess.TimeoutExpired:
             message = f'Forks Sync timed out cloning {repo.name}.'
             LOGGER.warning(message)
         except subprocess.CalledProcessError as error:
-            data = f'{repo.name}\n{error}'
-            LOGGER.warning(data)
+            message = f'{repo.name}\n{error}'
+            LOGGER.warning(message)
 
-    @staticmethod
-    def rebase_repo(repo, repo_path):
+    def rebase_repo(self, thread_limiter, repo, repo_path):
         """Rebase your origin fork against the upstream default branch"""
         branch = repo.parent.default_branch
         command = (
@@ -134,27 +141,21 @@ class ForksSync:
         )
 
         try:
-            subprocess.run(
-                command,
-                stdin=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                shell=True,
-                check=True,
-                timeout=TIMEOUT,
-            )
-            data = f'{repo.name} rebased!'
-            LOGGER.info(data)
+            thread_limiter.acquire()
+            if self.force:
+                subprocess.run(
+                    command,
+                    stdin=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    shell=True,
+                    check=True,
+                    timeout=self.timeout,
+                )
+            message = f'{repo.name} rebased!'
+            LOGGER.info(message)
         except subprocess.TimeoutExpired:
             message = f'Forks Sync timed out rebasing {repo.name}.'
             LOGGER.warning(message)
         except subprocess.CalledProcessError as error:
-            data = f'{repo.name}\n{error}'
-            LOGGER.warning(data)
-
-
-def main():
-    ForksSync().run()
-
-
-if __name__ == '__main__':
-    main()
+            message = f'{repo.name}\n{error}'
+            LOGGER.warning(message)
