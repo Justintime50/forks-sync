@@ -1,5 +1,2 @@
-[report]
-exclude_lines =
-    if __name__ == '__main__':
-    main()
-    Cli()
+[run]
+omit = forks_sync/cli.py
