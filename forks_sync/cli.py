@@ -54,6 +54,7 @@ class ForksSyncCli:
     def run(self):
         forks_sync = ForksSync(
             token=self.token,
+            force=self.force,
             threads=self.threads,
             timeout=self.timeout,
             location=self.location,
