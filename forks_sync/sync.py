@@ -103,23 +103,22 @@ class ForksSync:
 
     def clone_repo(self, thread_limiter, repo, repo_path):
         """Clone projects that don't exist locally."""
-        command = (
-            f'git clone --depth=1 {repo.ssh_url} {repo_path}'
-            f' && cd {repo_path}'
-            f' && git remote add upstream {repo.parent.clone_url}',
-        )
+        commands = [
+            ['git', 'clone', '--depth=1', repo.ssh_url, repo_path],
+            ['git', '-C', repo_path, 'remote', 'add', 'upstream', repo.parent.clone_url],
+        ]
 
         try:
             thread_limiter.acquire()
             if self.force:
-                subprocess.run(
-                    command,
-                    stdin=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    shell=True,
-                    check=True,
-                    timeout=self.timeout,
-                )
+                for command in commands:
+                    subprocess.run(
+                        command,
+                        stdin=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=True,
+                        timeout=self.timeout,
+                    )
             message = f'{repo.name} cloned!'
             LOGGER.info(message)
         except subprocess.TimeoutExpired:
@@ -132,25 +131,24 @@ class ForksSync:
     def rebase_repo(self, thread_limiter, repo, repo_path):
         """Rebase your origin fork against the upstream default branch"""
         branch = repo.parent.default_branch
-        command = (
-            f'cd {repo_path}'
-            f' && git checkout {branch}'
-            ' && git fetch upstream'
-            f' && git rebase upstream/{branch}'
-            ' && git push origin -f',
-        )
+        commands = [
+            ['git', '-C', repo_path, 'checkout', branch],
+            ['git', '-C', repo_path, 'fetch', 'upstream'],
+            ['git', '-C', repo_path, 'rebase', f'upstream/{branch}'],
+            ['git', '-C', repo_path, 'push', 'origin', '-f'],
+        ]
 
         try:
             thread_limiter.acquire()
             if self.force:
-                subprocess.run(
-                    command,
-                    stdin=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    shell=True,
-                    check=True,
-                    timeout=self.timeout,
-                )
+                for command in commands:
+                    subprocess.run(
+                        command,
+                        stdin=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=True,
+                        timeout=self.timeout,
+                    )
             message = f'{repo.name} rebased!'
             LOGGER.info(message)
         except subprocess.TimeoutExpired:

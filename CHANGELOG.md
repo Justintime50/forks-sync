@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.0.1 (2021-11-02)
+
+* Refactors the git operations behind the tool to no longer spawn a shell process when using the subprocess module. Removed commands to change directories and instead direct all git commands to the correct path at invocation
+
 ## v3.0.0 (2021-10-19)
 
 * Refactors the entire app to use CLI arguments instead of environment variables
