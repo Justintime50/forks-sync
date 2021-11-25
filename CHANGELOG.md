@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.0.2 (2021-11-24)
+
+* Use `woodchips` for logging (same behavior as before)
+* Added Python type hinting and stronger test assertions
+
 ## v3.0.1 (2021-11-02)
 
 * Refactors the git operations behind the tool to no longer spawn a shell process when using the subprocess module. Removed commands to change directories and instead direct all git commands to the correct path at invocation

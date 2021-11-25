@@ -5,6 +5,7 @@ with open('README.md', 'r') as fh:
 
 REQUIREMENTS = [
     'PyGithub == 1.*',
+    'woodchips == 0.2.*',
 ]
 
 DEV_REQUIREMENTS = [
@@ -18,7 +19,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='3.0.1',
+    version='3.0.2',
     description='Keep all your git forks up to date with the remote default branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -40,5 +41,5 @@ setuptools.setup(
             'forks-sync=forks_sync.cli:main',
         ],
     },
-    python_requires='>=3.7',
+    python_requires='>=3.7, <4',
 )
