@@ -36,7 +36,8 @@ class ForksSync:
 
         # Internal variables
         self.github_instance = Github(self.token) if self.token else Github()
-        self.authenticated_user = self.github_instance.get_user() if self.token else None
+        if self.token:
+            self.authenticated_user = self.github_instance.get_user()
 
     def run(self):
         """Run the Forks Sync script."""
@@ -111,7 +112,7 @@ class ForksSync:
         for thread in thread_list:
             thread.join()
 
-    def sync_forks(self, thread_limiter: BoundedSemaphore, repo: List[Repository.Repository], repo_path: str):
+    def sync_forks(self, thread_limiter: BoundedSemaphore, repo: Repository.Repository, repo_path: str):
         """Sync forks by cloning forks that aren't local and rebasing the
         forked default branch of the ones that are.
         """

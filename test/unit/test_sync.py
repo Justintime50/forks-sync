@@ -146,7 +146,7 @@ def test_clone_repo_force(mock_logger, mock_subprocess, mock_repo, mock_repo_pat
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))
+@patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd='subprocess.run', timeout=0.1))
 def test_clone_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw errors when the subprocess times out."""
     message = 'Forks Sync timed out cloning ' + mock_repo.name + '.'
@@ -159,7 +159,7 @@ def test_clone_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mo
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.run))
+@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.run'))
 def test_clone_repo_called_process_error(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw an error when the subprocess hits an error."""
     ForksSync(
@@ -198,7 +198,7 @@ def test_rebase_repo_force(mock_logger, mock_subprocess, mock_repo, mock_repo_pa
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd=subprocess.run, timeout=0.1))
+@patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd='subprocess.run', timeout=0.1))
 def test_rebase_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw errors when the subprocess times out."""
     message = 'Forks Sync timed out rebasing ' + mock_repo.name + '.'
@@ -211,7 +211,7 @@ def test_rebase_repo_timeout_exception(mock_exception, mock_logger, mock_repo, m
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.run))
+@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.run'))
 def test_rebase_repo_called_process_error(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw an error when the subprocess hits an error."""
     ForksSync(

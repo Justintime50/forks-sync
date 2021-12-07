@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 3.0.2 (2021-11-24)
+## v3.0.3 (2021-12-07)
+
+* Adds `mypy` type checking
+
+## v3.0.2 (2021-11-24)
 
 * Use `woodchips` for logging (same behavior as before)
 * Added Python type hinting and stronger test assertions
