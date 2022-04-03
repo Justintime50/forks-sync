@@ -20,7 +20,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='3.0.3',
+    version='3.0.4',
     description='Keep all your git forks up to date with the remote default branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",

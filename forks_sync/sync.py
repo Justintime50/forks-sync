@@ -157,7 +157,7 @@ class ForksSync:
         branch = repo.parent.default_branch
         commands = [
             ['git', '-C', repo_path, 'checkout', branch],
-            ['git', '-C', repo_path, 'fetch', 'upstream'],
+            ['git', '-C', repo_path, 'fetch', 'upstream', '--depth=1'],
             ['git', '-C', repo_path, 'rebase', f'upstream/{branch}'],
             ['git', '-C', repo_path, 'push', 'origin', '-f'],
         ]
