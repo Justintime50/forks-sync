@@ -1,10 +1,10 @@
+__pycache__
+.coverage
 .DS_Store
-forked_repos
-logs
 *.egg-info
 build
 dist
-__pycache__
+forked_repos
 htmlcov
-.coverage
+logs
 venv
