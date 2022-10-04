@@ -1,12 +1,21 @@
 import logging
 import os
-import subprocess
+import subprocess  # nosec
 from datetime import datetime
-from threading import BoundedSemaphore, Thread
-from typing import List, Optional
+from threading import (
+    BoundedSemaphore,
+    Thread,
+)
+from typing import (
+    List,
+    Optional,
+)
 
 import woodchips
-from github import Github, Repository
+from github import (
+    Github,
+    Repository,
+)
 
 from forks_sync.constants import (
     DEFAULT_LOCATION,
@@ -14,6 +23,7 @@ from forks_sync.constants import (
     DEFAULT_TIMEOUT,
     LOGGER_NAME,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +144,7 @@ class ForksSync:
             thread_limiter.acquire()
             if self.force:
                 for command in commands:
-                    subprocess.run(
+                    subprocess.run(  # nosec
                         command,
                         stdin=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
@@ -166,7 +176,7 @@ class ForksSync:
             thread_limiter.acquire()
             if self.force:
                 for command in commands:
-                    subprocess.run(
+                    subprocess.run(  # nosec
                         command,
                         stdin=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,

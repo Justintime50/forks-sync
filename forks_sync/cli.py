@@ -1,7 +1,11 @@
 import argparse
 
 from forks_sync import ForksSync
-from forks_sync.constants import DEFAULT_LOCATION, DEFAULT_NUM_THREADS, DEFAULT_TIMEOUT
+from forks_sync.constants import (
+    DEFAULT_LOCATION,
+    DEFAULT_NUM_THREADS,
+    DEFAULT_TIMEOUT,
+)
 
 
 class ForksSyncCli:
