@@ -14,5 +14,4 @@ def mock_repo():
 
 @pytest.fixture(scope='module')
 def mock_repo_path():
-
     return 'test/forks/mock-repo'
