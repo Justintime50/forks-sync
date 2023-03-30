@@ -17,7 +17,7 @@ If you manage more than a couple git forks, keeping them up to date with their r
 
 By default, Forks Sync will save all your forks to `~/forks-sync` where you can also find logs for this tool.
 
-**NOTE:** Before proceeding, know that this tool will forcefully update the default branch of your fork to match the upstream default branch.
+**This tool will forcefully update the default branch of your fork to match the upstream default branch which could results in loss of changes if they are not committed on default branches.**
 
 ## Install
 
