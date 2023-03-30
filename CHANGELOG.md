@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3.0.5 (2023-03-30)
+
+- Fixes a bug that would clobber error output, now it will show correctly
+- Bumps all dependencies
+
 ## v3.0.4 (2022-04-03)
 
 - Corrects the `git fetch` command to a depth of 1 since we are also shallow cloning repos locally. This should greatly speed up the syncing process for larger repositories since we don't require the entire project tree

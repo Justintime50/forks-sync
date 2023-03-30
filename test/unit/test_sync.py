@@ -122,7 +122,6 @@ def test_sync_forks_path_doesnt_exist(mock_clone_repo, mock_rebase_repo, mock_re
 @patch('logging.Logger.info')
 def test_clone_repo(mock_logger, mock_subprocess, mock_repo, mock_repo_path):
     """Tests that we clone a repo (dry-run)."""
-    # TODO: Mock the subprocess better to ensure it does what is intended
     ForksSync(
         token='123',
     ).clone_repo(mock_thread_limiter(), mock_repo, mock_repo_path)
@@ -159,7 +158,7 @@ def test_clone_repo_timeout_exception(mock_exception, mock_logger, mock_repo, mo
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.run'))
+@patch('subprocess.run', side_effect=subprocess.CalledProcessError(cmd='subprocess.run', returncode=1))
 def test_clone_repo_called_process_error(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw an error when the subprocess hits an error."""
     ForksSync(
@@ -174,7 +173,6 @@ def test_clone_repo_called_process_error(mock_exception, mock_logger, mock_repo,
 @patch('logging.Logger.info')
 def test_rebase_repo(mock_logger, mock_subprocess, mock_repo, mock_repo_path):
     """Tests that we rebase a repo (dry-run)."""
-    # TODO: Mock the subprocess better to ensure it does what is intended
     ForksSync(
         token='123',
     ).rebase_repo(mock_thread_limiter(), mock_repo, mock_repo_path)
@@ -211,7 +209,7 @@ def test_rebase_repo_timeout_exception(mock_exception, mock_logger, mock_repo, m
 
 
 @patch('logging.Logger.warning')
-@patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.run'))
+@patch('subprocess.run', side_effect=subprocess.CalledProcessError(cmd='subprocess.run', returncode=1))
 def test_rebase_repo_called_process_error(mock_exception, mock_logger, mock_repo, mock_repo_path):
     """Tests that we throw an error when the subprocess hits an error."""
     ForksSync(

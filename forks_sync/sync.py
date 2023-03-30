@@ -144,21 +144,17 @@ class ForksSync:
             thread_limiter.acquire()
             if self.force:
                 for command in commands:
-                    subprocess.run(  # nosec
+                    subprocess.check_output(  # nosec
                         command,
-                        stdin=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                        check=True,
+                        stderr=subprocess.STDOUT,
+                        text=True,
                         timeout=self.timeout,
                     )
-            message = f'{repo.name} cloned!'
-            logger.info(message)
+            logger.info(f'{repo.name} cloned!')
         except subprocess.TimeoutExpired:
-            message = f'Forks Sync timed out cloning {repo.name}.'
-            logger.warning(message)
+            logger.warning(f'Forks Sync timed out cloning {repo.name}.')
         except subprocess.CalledProcessError as error:
-            message = f'{repo.name}\n{error}'
-            logger.warning(message)
+            logger.warning(f'{repo.name}\n{error.output}')
 
     def rebase_repo(self, thread_limiter: BoundedSemaphore, repo: Repository.Repository, repo_path: str):
         """Rebase your origin fork against the upstream default branch."""
@@ -176,18 +172,14 @@ class ForksSync:
             thread_limiter.acquire()
             if self.force:
                 for command in commands:
-                    subprocess.run(  # nosec
+                    subprocess.check_output(  # nosec
                         command,
-                        stdin=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                        check=True,
+                        stderr=subprocess.STDOUT,
+                        text=True,
                         timeout=self.timeout,
                     )
-            message = f'{repo.name} rebased!'
-            logger.info(message)
+            logger.info(f'{repo.name} rebased!')
         except subprocess.TimeoutExpired:
-            message = f'Forks Sync timed out rebasing {repo.name}.'
-            logger.warning(message)
+            logger.warning(f'Forks Sync timed out rebasing {repo.name}.')
         except subprocess.CalledProcessError as error:
-            message = f'{repo.name}\n{error}'
-            logger.warning(message)
+            logger.warning(f'{repo.name}\n{error.output}')

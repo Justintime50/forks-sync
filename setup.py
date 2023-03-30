@@ -11,11 +11,11 @@ REQUIREMENTS = [
 
 DEV_REQUIREMENTS = [
     'bandit == 1.7.*',
-    'black == 22.*',
-    'build == 0.7.*',
-    'flake8 == 4.*',
+    'black == 23.*',
+    'build == 0.10.*',
+    'flake8 == 5.*',
     'isort == 5.*',
-    'mypy == 0.942',
+    'mypy == 1.1.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
     'twine == 4.*',
@@ -23,7 +23,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='forks-sync',
-    version='3.0.4',
+    version='3.0.5',
     description='Keep all your git forks up to date with the remote default branch.',
     long_description=long_description,
     long_description_content_type="text/markdown",
