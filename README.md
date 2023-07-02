@@ -26,12 +26,12 @@ By default, Forks Sync will save all your forks to `~/forks-sync` where you can 
 pip3 install forks-sync
 
 # Install locally
-make install
+just install
 ```
 
 ## Usage
 
-```
+```text
 Usage:
     forks-sync --token 123...
 
@@ -61,7 +61,7 @@ ssh-add
 
 ```bash
 # Get a comprehensive list of development tools
-make help
+just --list
 
 # Run the tool locally
 venv/bin/python forks_sync/sync.py

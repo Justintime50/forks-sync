@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.0.0 (2023-07-01)
+
+- Drops support for Python 3.7
+
 ## v3.0.5 (2023-03-30)
 
 - Fixes a bug that would clobber error output, now it will show correctly
