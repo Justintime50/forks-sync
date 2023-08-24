@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.1.0 (2023-08-24)
+
+- Swaps the `ssh_url` for the `clone_url` when cloning repos to remove the unnecessary reliance on having an SSH key or agent to use this tool
+- Adds `--version` CLI flag
+
 ## v4.0.0 (2023-07-01)
 
 - Drops support for Python 3.7

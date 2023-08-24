@@ -46,15 +46,7 @@ Options:
                             The number of seconds before a git operation times out.
     -l LOCATION, --location LOCATION
                             The location where you want your forks and logs to be stored.
-```
-
-### Automating SSH Passphrase Prompt (Recommended)
-
-To allow the script to run continuosly without requiring your SSH passphrase, you'll need to add your passphrase to the SSH agent. **NOTE:** Your SSH passphrase will be unloaded upon logout.
-
-```bash
-# This assumes you've saved your SSH keys to the default location
-ssh-add
+    --version             show program's version number and exit
 ```
 
 ## Development

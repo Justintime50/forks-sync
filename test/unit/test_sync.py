@@ -76,7 +76,7 @@ def test_get_forked_repos(mock_get_user):
         token='123',
     ).get_forked_repos()
 
-    assert type(repos) == list
+    assert isinstance(repos, list)
 
 
 @patch('forks_sync.sync.ForksSync.sync_forks')

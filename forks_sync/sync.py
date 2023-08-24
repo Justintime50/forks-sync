@@ -13,6 +13,7 @@ from typing import (
 
 import woodchips
 from github import (
+    Auth,
     Github,
     Repository,
 )
@@ -45,7 +46,7 @@ class ForksSync:
         self.location = location
 
         # Internal variables
-        self.github_instance = Github(self.token) if self.token else Github()
+        self.github_instance = Github(auth=Auth.Token(self.token)) if self.token else Github()
         if self.token:
             self.authenticated_user = self.github_instance.get_user()
 
@@ -136,7 +137,7 @@ class ForksSync:
         logger = woodchips.get(LOGGER_NAME)
 
         commands = [
-            ['git', 'clone', '--depth=1', repo.ssh_url, repo_path],
+            ['git', 'clone', '--depth=1', repo.clone_url, repo_path],
             ['git', '-C', repo_path, 'remote', 'add', 'upstream', repo.parent.clone_url],
         ]
 

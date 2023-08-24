@@ -1,6 +1,7 @@
 import argparse
 
 from forks_sync import ForksSync
+from forks_sync._version import __version__
 from forks_sync.constants import (
     DEFAULT_LOCATION,
     DEFAULT_NUM_THREADS,
@@ -53,6 +54,11 @@ class ForksSyncCli:
             default=DEFAULT_LOCATION,
             help='The location where you want your forks and logs to be stored.',
         ),
+        parser.add_argument(
+            '--version',
+            action='version',
+            version=f'%(prog)s {__version__}',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
