@@ -1,6 +1,14 @@
 # CHANGELOG
 
+## v4.2.0 (2023-08-24)
+
+- Corrects the premature URL changes from `v4.1.0`
+  - Restores the previous behavior of using the SSH URL by default
+  - Adds new `--https` flag that will trigger using the `clone_url` instead of the default `ssh_url`
+
 ## v4.1.0 (2023-08-24)
+
+**NOTE:** Please do not use this release! It has been yanked from PyPi
 
 - Swaps the `ssh_url` for the `clone_url` when cloning repos to remove the unnecessary reliance on having an SSH key or agent to use this tool
 - Adds `--version` CLI flag

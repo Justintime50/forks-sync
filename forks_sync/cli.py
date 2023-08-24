@@ -31,6 +31,13 @@ class ForksSyncCli:
             help='Pass this flag to force push changes to forked repos, otherwise the tool will run in "dry mode".',
         ),
         parser.add_argument(
+            '--https',
+            action='store_true',
+            required=False,
+            default=False,
+            help='Use HTTPS URLs instead of SSH.',
+        )
+        parser.add_argument(
             '-th',
             '--threads',
             type=int,
@@ -65,6 +72,7 @@ class ForksSyncCli:
         forks_sync = ForksSync(
             token=self.token,
             force=self.force,
+            use_https=self.https,
             threads=self.threads,
             timeout=self.timeout,
             location=self.location,

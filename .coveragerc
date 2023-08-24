@@ -1,2 +1,4 @@
 [run]
-omit = forks_sync/cli.py
+omit = 
+    forks_sync/cli.py
+    forks_sync/_version.py

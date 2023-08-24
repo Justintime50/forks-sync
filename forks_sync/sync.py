@@ -34,6 +34,7 @@ class ForksSync:
         self,
         token: Optional[str] = None,
         force: bool = False,
+        use_https: bool = False,
         threads: int = DEFAULT_NUM_THREADS,
         timeout: int = DEFAULT_TIMEOUT,
         location: str = DEFAULT_LOCATION,
@@ -41,6 +42,7 @@ class ForksSync:
         # Parameter variables
         self.token = token
         self.force = force
+        self.use_https = use_https
         self.threads = threads
         self.timeout = timeout
         self.location = location
@@ -136,8 +138,10 @@ class ForksSync:
         """Clone projects that don't exist locally."""
         logger = woodchips.get(LOGGER_NAME)
 
+        repo_url = repo.clone_url if self.use_https else repo.ssh_url
+
         commands = [
-            ['git', 'clone', '--depth=1', repo.clone_url, repo_path],
+            ['git', 'clone', '--depth=1', repo_url, repo_path],
             ['git', '-C', repo_path, 'remote', 'add', 'upstream', repo.parent.clone_url],
         ]
 

@@ -33,7 +33,7 @@ just install
 
 ```text
 Usage:
-    forks-sync --token 123...
+    forks-sync --token 123
 
 Options:
     -h, --help            show this help message and exit
@@ -48,6 +48,27 @@ Options:
                             The location where you want your forks and logs to be stored.
     --version             show program's version number and exit
 ```
+
+### Authentication
+
+There are two methods of authentication with this tool. The `--token` flag is required in addition to one of the following:
+
+#### SSH
+
+To allow the script to run continuosly without requiring passwords for every repo, you can add your SSH passphrase to the SSH agent:
+
+```bash
+# This assumes you've saved your SSH keys to the default location
+ssh-add
+```
+
+You can then run a command similar to `forks-sync --token 123` where the token is your GitHub API token. This will authenticate you with the GitHub API via the `token` and with GitHub via `ssh`.
+
+#### Git Credential Manager
+
+Alternatively, you can use a tool like [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) to populate your Git credentials under the hood. When not using SSH, we'll clone from the git URLs instead of the SSH URLs. To trigger this behavior, you must pass the `--https` flag.
+
+You can then run a command similar to `forks-sync --token 123 --https` where the token is your GitHub API token. This will authenticate you with the GitHub API via the `token` and with GitHub via your Git credentials via `GCM`.
 
 ## Development
 
