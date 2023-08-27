@@ -16,7 +16,7 @@ with open('forks_sync/_version.py', 'r') as version_file:
 
 
 REQUIREMENTS = [
-    'PyGithub == 1.*',
+    'PyGithub >= 1.59.0',
     'woodchips == 1.*',
 ]
 

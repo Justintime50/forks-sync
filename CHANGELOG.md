@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.2.1 (2023-08-27)
+
+- Fixes PyGithub pinned version to ensure `Auth` is available
+
 ## v4.2.0 (2023-08-24)
 
 - Corrects the premature URL changes from `v4.1.0`
