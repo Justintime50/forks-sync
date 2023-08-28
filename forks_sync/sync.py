@@ -45,7 +45,7 @@ class ForksSync:
         self.use_https = use_https
         self.threads = threads
         self.timeout = timeout
-        self.location = location
+        self.location = os.path.expanduser(location)
 
         # Internal variables
         self.github_instance = Github(auth=Auth.Token(self.token)) if self.token else Github()
